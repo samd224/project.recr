@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: recruitment-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost/api
+    depends_on:
+      - backend
+    networks:
+      - recruitment-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: recruitment-backend
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/recruitment
+      - PORT=4000
+    depends_on:
+      - mongodb
+    networks:
+      - recruitment-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: recruitment-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - recruitment-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: recruitment-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - recruitment-network
+
+networks:
+  recruitment-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
