@@ -8,6 +8,9 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
     networks:
@@ -21,6 +24,9 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/recruitment
       - PORT=4000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       - mongodb
     networks:
